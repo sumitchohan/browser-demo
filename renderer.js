@@ -16,21 +16,31 @@ var ById = function (id) {
     console.log('login clicked');
     views.hidden = false;
  }
- 
- function finishedLoad(event) {
+ var token;
+ var tokenKey=
+ function finishedLoad(event) { 
     if (view.src.toString().toLowerCase().indexOf('fs.ttx.com') > 0) {
-        view.getWebContents().executeJavaScript('document.getElementById("passwordInput").id')
-            .then(function (s) {
+        var passwordInput=view.getWebContents().executeJavaScript('document.getElementById("passwordInput").id')
+        if(passwordInput)
+        {
+            passwordInput.then(function (s) {
                 if (s === "passwordInput") {
-                    views.hidden = false;
+                    view.style.height='480px';
                 }
             });
+        }
     }
     else {
-        views.hidden = true;
+        view.style.height='0px';
     }
+    console.log("Navigated to - " + view.src);
  }
- console.log(steps);
+ function acquireToken(env,success)
+ {
+     
+ }
+ console.log(steps); 
+ view.style.height='0px'
  login.addEventListener('click', login_click);
  view.addEventListener('did-finish-load', finishedLoad);
  // https://github.com/hokein/electron-sample-apps/blob/master/webview/browser/browser.js#L5
