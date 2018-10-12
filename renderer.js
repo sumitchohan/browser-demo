@@ -16,7 +16,7 @@ function login_click() {
     console.log('login clicked');
     acquireAccessToken(function(){console.log("token" + sam_access_token)});
 }
-var sam_env = 'tst'
+var sam_env = 'prod';
 var config = {
     qa: { url: 'https://sams.ttx.com/admin/ui/applications', clientId: 'f40733a5-34b3-4591-a174-025326a3fc03' },
     prod: { url: 'https://sam.ttx.com/admin/ui/applications', clientId: 'f725f14f-c21f-4718-af77-cf85b2fd3bfd' },
@@ -32,8 +32,8 @@ function setAccessToken(t)
 function acquireAccessToken(callback)
 {
     console.log("checking..")
-    if(sam_access_token)
-    {
+    if(sam_access_token && parseJwt(sam_access_token).exp>(new Date().getTime())/1000)
+    { 
         callback();
     }
     else
@@ -43,9 +43,19 @@ function acquireAccessToken(callback)
     }
 } 
 var lastLoadedTime=new Date();
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(window.atob(base64));
+};
 function finishedLoad(event) {
     lastLoadedTime=new Date();
+    console.log("loaded - "+ lastLoadedTime);
     setTimeout(function(){
+        console.log("timeout - " + lastLoadedTime);
+        console.log(new Date()-lastLoadedTime);
+
+        console.log(view.src);
         if((new Date()-lastLoadedTime)>1998)
         {
             if (view.src.toString().toLowerCase().indexOf('.ttx.com/admin') > 0 || view.src.toString().toLowerCase().indexOf('google') > 0) {
@@ -67,6 +77,11 @@ function finishedLoad(event) {
             }
         }
     },2000);
+    if (view.src.toString().toLowerCase().indexOf('.ttx.com/admin') > 0 || view.src.toString().toLowerCase().indexOf('google') > 0) {
+
+        view.style.height = '0px';
+        
+    }
     console.log("Navigated to - " + view.src);
 } 
 console.log(sam_access_token);
